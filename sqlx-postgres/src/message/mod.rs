@@ -14,6 +14,7 @@ mod data_row;
 mod describe;
 mod execute;
 mod flush;
+#[cfg(feature = "gssapi")]
 mod gss;
 mod notification;
 mod parameter_description;
@@ -31,7 +32,9 @@ mod startup;
 mod sync;
 mod terminate;
 
-pub use authentication::{Authentication, AuthenticationSasl, AuthenticationGss};
+pub use authentication::{Authentication, AuthenticationSasl};
+#[cfg(feature = "gssapi")]
+pub use authentication::AuthenticationGss;
 pub use backend_key_data::BackendKeyData;
 pub use bind::Bind;
 pub use close::Close;
@@ -53,6 +56,7 @@ pub use ready_for_query::{ReadyForQuery, TransactionStatus};
 pub use response::{Notice, PgSeverity};
 pub use row_description::RowDescription;
 pub use sasl::{SaslInitialResponse, SaslResponse};
+#[cfg(feature = "gssapi")]
 pub use gss::GssResponse;
 use sqlx_core::io::ProtocolEncode;
 pub use ssl_request::SslRequest;

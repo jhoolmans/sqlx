@@ -29,6 +29,7 @@ mod executor;
 mod sasl;
 mod stream;
 mod tls;
+#[cfg(feature = "gssapi")]
 mod gss;
 
 /// A connection to a PostgreSQL database.

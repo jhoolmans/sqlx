@@ -38,11 +38,13 @@ pub enum Authentication {
 
     /// The frontend must now initiate a GSSAPI negotiation. 
     /// 
-    /// The frontend will send a GSSResponse message with the 
-    /// first part of the GSSAPI data stream in response to this. 
+    /// The frontend will send a [crate::message::GssResponse] 
+    /// message with the first part of the GSSAPI data stream 
+    /// in response to this. 
     /// 
     /// If further messages are needed, the server will 
     /// respond with [Authentication::GssContinue].
+    #[cfg(feature = "gssapi")]
     Gss(AuthenticationGss),
 
     /// This message contains the response data from the previous step 
@@ -51,10 +53,11 @@ pub enum Authentication {
     /// 
     /// If the GSSAPI or SSPI data in this message indicates more data is 
     /// needed to complete the authentication, the frontend must send 
-    /// that data as another GSSResponse message. If GSSAPI or SSPI 
-    /// authentication is completed by this message, the server will 
-    /// next send [Authentication::Ok] to indicate successful authentication 
-    /// or ErrorResponse to indicate failure.
+    /// that data as another [crate::message::GssResponse] message. If 
+    /// GSSAPI or SSPI authentication is completed by this message, the 
+    /// server will next send [Authentication::Ok] to indicate successful 
+    /// authentication or ErrorResponse to indicate failure.
+    #[cfg(feature = "gssapi")]
     GssContinue(AuthenticationGssContinue),
 
     /// The frontend must now initiate a SASL negotiation,
@@ -97,7 +100,9 @@ impl BackendMessage for Authentication {
                 Authentication::Md5Password(AuthenticationMd5Password { salt })
             },
 
+            #[cfg(feature = "gssapi")]
             7 => Authentication::Gss(AuthenticationGss(buf)),
+            #[cfg(feature = "gssapi")]
             8 => Authentication::GssContinue(AuthenticationGssContinue(buf)),
 
             10 => Authentication::Sasl(AuthenticationSasl(buf)),
@@ -118,9 +123,11 @@ pub struct AuthenticationMd5Password {
 }
 
 /// Body of [Authentication::Gss].
+#[cfg(feature = "gssapi")]
 #[derive(Debug)]
 pub struct AuthenticationGss(Bytes);
 
+#[cfg(feature = "gssapi")]
 impl AuthenticationGss {
     /// Retrieve the Gss data stream.
     pub fn body(&self) -> Vec<u8> {
@@ -129,9 +136,11 @@ impl AuthenticationGss {
 }
 
 /// Body of [Authentication::GssContinue].
+#[cfg(feature = "gssapi")]
 #[derive(Debug)]
 pub struct AuthenticationGssContinue(Bytes);
 
+#[cfg(feature = "gssapi")]
 impl AuthenticationGssContinue {
     /// Retrieve the Gss data stream.
     pub fn body(&self) -> Vec<u8> {

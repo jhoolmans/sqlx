@@ -1,7 +1,9 @@
 use crate::HashMap;
 
 use crate::common::StatementCache;
-use crate::connection::{gss, sasl, stream::PgStream};
+use crate::connection::{sasl, stream::PgStream};
+#[cfg(feature = "gssapi")]
+use crate::connection::gss;
 use crate::error::Error;
 use crate::io::StatementId;
 use crate::message::{
@@ -96,7 +98,7 @@ impl PgConnection {
                             })
                             .await?;
                     }
-
+                    #[cfg(feature = "gssapi")]
                     Authentication::Gss(body) => {
                         gss::authenticate(&mut stream, options, body).await?;
                     }
