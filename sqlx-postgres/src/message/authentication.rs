@@ -36,6 +36,27 @@ pub enum Authentication {
     /// again using the 4-byte random salt.
     Md5Password(AuthenticationMd5Password),
 
+    /// The frontend must now initiate a GSSAPI negotiation. 
+    /// 
+    /// The frontend will send a GSSResponse message with the 
+    /// first part of the GSSAPI data stream in response to this. 
+    /// 
+    /// If further messages are needed, the server will 
+    /// respond with [Authentication::GssContinue].
+    Gss(AuthenticationGss),
+
+    /// This message contains the response data from the previous step 
+    /// of GSSAPI or SSPI negotiation ([Authentication::Gss], 
+    /// [Authentication::Sspi] or a previous [Authentication::GssContinue]). 
+    /// 
+    /// If the GSSAPI or SSPI data in this message indicates more data is 
+    /// needed to complete the authentication, the frontend must send 
+    /// that data as another GSSResponse message. If GSSAPI or SSPI 
+    /// authentication is completed by this message, the server will 
+    /// next send [Authentication::Ok] to indicate successful authentication 
+    /// or ErrorResponse to indicate failure.
+    GssContinue(AuthenticationGssContinue),
+
     /// The frontend must now initiate a SASL negotiation,
     /// using one of the SASL mechanisms listed in the message.
     ///
@@ -74,7 +95,10 @@ impl BackendMessage for Authentication {
                 buf.copy_to_slice(&mut salt);
 
                 Authentication::Md5Password(AuthenticationMd5Password { salt })
-            }
+            },
+
+            7 => Authentication::Gss(AuthenticationGss(buf)),
+            9 => Authentication::GssContinue(AuthenticationGssContinue(buf)),
 
             10 => Authentication::Sasl(AuthenticationSasl(buf)),
             11 => Authentication::SaslContinue(AuthenticationSaslContinue::decode(buf)?),
@@ -91,6 +115,28 @@ impl BackendMessage for Authentication {
 #[derive(Debug)]
 pub struct AuthenticationMd5Password {
     pub salt: [u8; 4],
+}
+
+/// Body of [Authentication::Gss].
+#[derive(Debug)]
+pub struct AuthenticationGss(Bytes);
+
+impl AuthenticationGss {
+    /// Retrieve the Gss data stream.
+    pub fn body(&self) -> Vec<u8> {
+        self.0.to_vec()
+    }
+}
+
+/// Body of [Authentication::GssContinue].
+#[derive(Debug)]
+pub struct AuthenticationGssContinue(Bytes);
+
+impl AuthenticationGssContinue {
+    /// Retrieve the Gss data stream.
+    pub fn body(&self) -> Vec<u8> {
+        self.0.to_vec()
+    }
 }
 
 /// Body of [Authentication::Sasl].
