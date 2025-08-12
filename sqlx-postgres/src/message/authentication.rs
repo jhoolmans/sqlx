@@ -98,7 +98,7 @@ impl BackendMessage for Authentication {
             },
 
             7 => Authentication::Gss(AuthenticationGss(buf)),
-            9 => Authentication::GssContinue(AuthenticationGssContinue(buf)),
+            8 => Authentication::GssContinue(AuthenticationGssContinue(buf)),
 
             10 => Authentication::Sasl(AuthenticationSasl(buf)),
             11 => Authentication::SaslContinue(AuthenticationSaslContinue::decode(buf)?),
