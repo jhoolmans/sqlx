@@ -65,7 +65,6 @@ default = ["any", "macros", "migrate", "json"]
 derive = ["sqlx-macros/derive"]
 macros = ["derive", "sqlx-macros/macros"]
 migrate = ["sqlx-core/migrate", "sqlx-macros?/migrate", "sqlx-mysql?/migrate", "sqlx-postgres?/migrate", "sqlx-sqlite?/migrate"]
-gssapi = ["sqlx-postgres/gssapi"]
 
 # Enable parsing of `sqlx.toml` for configuring macros and migrations.
 sqlx-toml = ["sqlx-core/sqlx-toml", "sqlx-macros?/sqlx-toml", "sqlx-sqlite?/sqlx-toml"]
@@ -118,6 +117,9 @@ any = ["sqlx-core/any", "sqlx-mysql?/any", "sqlx-postgres?/any", "sqlx-sqlite?/a
 postgres = ["sqlx-postgres", "sqlx-macros?/postgres"]
 mysql = ["sqlx-mysql", "sqlx-macros?/mysql"]
 sqlite = ["sqlite-bundled", "sqlite-deserialize", "sqlite-load-extension", "sqlite-unlock-notify"]
+
+# Enables support for PostgreSQL GSSAPI authentication.
+postgres-gssapi = ["sqlx-postgres/gssapi"]
 
 # SQLite base features
 sqlite-bundled = ["_sqlite", "sqlx-sqlite/bundled", "sqlx-macros?/sqlite"]
